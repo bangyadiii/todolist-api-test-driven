@@ -62,13 +62,14 @@ class TodoListTest extends TestCase
 
     public function test_post_new_todo_list_with_invalid_payload()
     {
+        $this->withExceptionHandling();
         $todoList = TodoList::factory()->make();
 
         $response = $this->postJson(route("api.todolist.store", [
-            "title" => $todoList->title,
             "description" => $todoList->description
         ]))
-            ->assertUnprocessable()
-            ->json();
+            ->assertUnprocessable();
+
+        $response->assertJsonValidationErrors(["title"]);
     }
 }
