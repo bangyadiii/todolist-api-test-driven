@@ -4,9 +4,11 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\PostTodoListRequest;
+use App\Http\Requests\UpdateTodoListRequest;
 use App\Models\TodoList;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Validator;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 
@@ -20,16 +22,6 @@ class TodoListController extends Controller
     public function index()
     {
         return TodoList::all();
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
     }
 
     /**
@@ -52,19 +44,9 @@ class TodoListController extends Controller
      */
     public function show($id)
     {
-        return TodoList::find($id);
+        return TodoList::findOrFail($id);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
 
     /**
      * Update the specified resource in storage.
@@ -73,9 +55,13 @@ class TodoListController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(UpdateTodoListRequest $request, $id)
     {
-        //
+        $todo = TodoList::findOrFail($id);
+        $todo->fill($request->all())
+            ->saveOrFail();
+
+        return \response()->json($todo, Response::HTTP_OK);
     }
 
     /**
@@ -86,6 +72,11 @@ class TodoListController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $deleted = TodoList::destroy($id);
+        if (!$deleted) {
+            \abort(404, "Todolist not found");
+            return;
+        }
+        return \response()->noContent();
     }
 }

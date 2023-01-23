@@ -35,6 +35,12 @@ class TodoListTest extends TestCase
         $this->assertEquals(1, count($response->json()));
     }
 
+    public function test_not_found_when_show_todo_detail_with_invalid_id()
+    {
+        $this->withExceptionHandling();
+        $response = $this->get(route("api.todolist.show", "unknown"))
+            ->assertNotFound();
+    }
 
     public function test_show_todo_details()
     {
@@ -71,5 +77,62 @@ class TodoListTest extends TestCase
             ->assertUnprocessable();
 
         $response->assertJsonValidationErrors(["title"]);
+    }
+
+    public function test_delete_todo_list_with_invalid_id()
+    {
+        $this->withExceptionHandling();
+        $this->delete(route("api.todolist.delete", 120000000))
+            ->assertNotFound();
+    }
+
+    public function test_delete_todo_list()
+    {
+
+        $this->delete(route("api.todolist.delete", $this->todo->id))
+            ->assertNoContent();
+        $this->assertDatabaseMissing("todo_lists", ["id" => $this->todo->id]);
+    }
+
+    public function test_update_todo_list_with_invalid_id()
+    {
+        $this->withExceptionHandling();
+        $response = $this->putJson(\route("api.todolist.update", "unknown"), [
+            "title" => "update success"
+        ])
+            ->assertNotFound();
+    }
+
+    public function test_update_todo_list_with_invalid_payload()
+    {
+        $this->withExceptionHandling();
+        $response = $this->putJson(\route("api.todolist.update", $this->todo->id), [
+            "title" => 123,
+            "description"  => "<script> const a = document.querySelector('#id'); a.addEventListener('click', ()=> console.log();); </script>"
+        ])
+            ->assertUnprocessable();
+        $response->assertJsonValidationErrors("title");
+    }
+
+    public function test_update_todo_list_with_valid_payload()
+    {
+        $response = $this->putJson(\route("api.todolist.update", $this->todo->id), [
+            "title" => "update success"
+        ])
+            ->assertOk();
+        $this->assertDatabaseHas(
+            "todo_lists",
+            [
+                "id" => $this->todo->id,
+                "title" => "update success"
+            ]
+        );
+        $arr = $response->json();
+
+        $response->assertJson([
+            "id" => $this->todo->id,
+            "title" => $arr["title"],
+            "description" => $arr["description"],
+        ]);
     }
 }
