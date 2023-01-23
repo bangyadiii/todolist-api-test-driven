@@ -1,6 +1,6 @@
 <?php
 
-use Illuminate\Http\Request;
+use App\Http\Controllers\API\TodoListController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -14,6 +14,6 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
+Route::get('/todo-list', [TodoListController::class, "index"])->name("api.todolist");
+Route::get('/todo-list/{id}', [TodoListController::class, "show"])->name("api.todolist.show");
+Route::post('/todo-list', [TodoListController::class, "store"])->name("api.todolist.store");
