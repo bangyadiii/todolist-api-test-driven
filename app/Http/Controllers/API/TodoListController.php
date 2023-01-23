@@ -32,8 +32,8 @@ class TodoListController extends Controller
      */
     public function store(PostTodoListRequest $request)
     {
-        $todo = TodoList::create($request->validated());
-        return \response()->json($todo, Response::HTTP_CREATED);
+        $list = TodoList::create($request->validated());
+        return \response()->json($list, Response::HTTP_CREATED);
     }
 
     /**
@@ -57,11 +57,11 @@ class TodoListController extends Controller
      */
     public function update(UpdateTodoListRequest $request, $id)
     {
-        $todo = TodoList::findOrFail($id);
-        $todo->fill($request->all())
+        $list = TodoList::findOrFail($id);
+        $list->fill($request->all())
             ->saveOrFail();
 
-        return \response()->json($todo, Response::HTTP_OK);
+        return \response()->json($list, Response::HTTP_OK);
     }
 
     /**

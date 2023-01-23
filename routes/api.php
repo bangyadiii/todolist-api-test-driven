@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\API\TodoListController;
+use App\Models\TodoList;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -14,8 +15,4 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/todo-list', [TodoListController::class, "index"])->name("api.todolist");
-Route::get('/todo-list/{id}', [TodoListController::class, "show"])->name("api.todolist.show");
-Route::post('/todo-list', [TodoListController::class, "store"])->name("api.todolist.store");
-Route::delete('/todo-list/{id}', [TodoListController::class, "destroy"])->name("api.todolist.delete");
-Route::put('/todo-list/{id}', [TodoListController::class, "update"])->name("api.todolist.update");
+Route::as("api")->apiResource("todolist", TodoListController::class);

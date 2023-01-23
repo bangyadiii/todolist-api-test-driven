@@ -11,13 +11,13 @@ use Tests\TestCase;
 class TodoListTest extends TestCase
 {
     use CreatesApplication, RefreshDatabase;
-    private $todo;
+    private $list;
 
     public function setUp(): void
     {
         parent::setUp();
         $this->withoutExceptionHandling();
-        $this->todo = TodoList::factory()->create();
+        $this->list = TodoList::factory()->create();
     }
 
     /**
@@ -28,7 +28,7 @@ class TodoListTest extends TestCase
     public function test_get_todo_list()
     {
         // action
-        $response = $this->get(route("api.todolist"));
+        $response = $this->get(route("api.todolist.index"));
 
         // assert
         $response->assertStatus(200);
@@ -44,12 +44,12 @@ class TodoListTest extends TestCase
 
     public function test_show_todo_details()
     {
-        $response = $this->get(route("api.todolist.show", $this->todo->id))
+        $response = $this->get(route("api.todolist.show", $this->list->id))
             ->assertOk()
             ->json();
 
-        $this->assertEquals($response["title"], $this->todo->title);
-        $this->assertEquals($response["description"], $this->todo->description);
+        $this->assertEquals($response["title"], $this->list->title);
+        $this->assertEquals($response["description"], $this->list->description);
     }
 
     public function test_post_new_todo_list_with_valid_payload()
@@ -82,16 +82,16 @@ class TodoListTest extends TestCase
     public function test_delete_todo_list_with_invalid_id()
     {
         $this->withExceptionHandling();
-        $this->delete(route("api.todolist.delete", 120000000))
+        $this->deleteJson(route("api.todolist.destroy", 120000000))
             ->assertNotFound();
     }
 
     public function test_delete_todo_list()
     {
 
-        $this->delete(route("api.todolist.delete", $this->todo->id))
+        $this->deleteJson(route("api.todolist.destroy", $this->list->id))
             ->assertNoContent();
-        $this->assertDatabaseMissing("todo_lists", ["id" => $this->todo->id]);
+        $this->assertDatabaseMissing("todo_lists", ["id" => $this->list->id]);
     }
 
     public function test_update_todo_list_with_invalid_id()
@@ -106,7 +106,7 @@ class TodoListTest extends TestCase
     public function test_update_todo_list_with_invalid_payload()
     {
         $this->withExceptionHandling();
-        $response = $this->putJson(\route("api.todolist.update", $this->todo->id), [
+        $response = $this->putJson(\route("api.todolist.update", $this->list->id), [
             "title" => 123,
             "description"  => "<script> const a = document.querySelector('#id'); a.addEventListener('click', ()=> console.log();); </script>"
         ])
@@ -116,21 +116,21 @@ class TodoListTest extends TestCase
 
     public function test_update_todo_list_with_valid_payload()
     {
-        $response = $this->putJson(\route("api.todolist.update", $this->todo->id), [
+        $response = $this->putJson(\route("api.todolist.update", $this->list->id), [
             "title" => "update success"
         ])
             ->assertOk();
         $this->assertDatabaseHas(
             "todo_lists",
             [
-                "id" => $this->todo->id,
+                "id" => $this->list->id,
                 "title" => "update success"
             ]
         );
         $arr = $response->json();
 
         $response->assertJson([
-            "id" => $this->todo->id,
+            "id" => $this->list->id,
             "title" => $arr["title"],
             "description" => $arr["description"],
         ]);
