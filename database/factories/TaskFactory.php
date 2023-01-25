@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\TodoList;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -16,8 +17,10 @@ class TaskFactory extends Factory
      */
     public function definition()
     {
+        $list = TodoList::pluck('id')->toArray();
         return [
             "title" => $this->faker->word(2),
+            "todo_list_id" => $this->faker->randomElement($list),
         ];
     }
 }

@@ -10,6 +10,11 @@ class Task extends Model
     use HasFactory;
 
     protected $fillable = [
-        "title"
+        "title", "todo_list_id"
     ];
+
+    public function todolist()
+    {
+        return $this->belongsTo(TodoList::class, "todo_list_id");
+    }
 }

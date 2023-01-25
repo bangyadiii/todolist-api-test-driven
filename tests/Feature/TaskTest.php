@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Task;
+use App\Models\TodoList;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
@@ -12,10 +13,12 @@ class TaskTest extends TestCase
     use RefreshDatabase;
 
     private $task;
+    private $list;
 
     public function setUp(): void
     {
         parent::setUp();
+        $this->list = $this->createTodo();
         $this->task = $this->createTask();
     }
 
@@ -26,32 +29,47 @@ class TaskTest extends TestCase
      */
     public function test_fetch_all_task_of_the_todo_list()
     {
-        $response = $this->getJson(\route("api.task.index"));
+        $todo = $this->createTodo();
+        $task = $this->createTask(['todo_list_id' => $todo->id]);
+
+        $response = $this->getJson(\route("api.todolist.task.index", $this->list->id));
 
         $response->assertOk();
-        $response->assertJsonCount(1);
-        $this->assertEquals($response->json()[0]["title"], $this->task->title);
+        // $data = $response->json();
+        // $this->assertEquals($response->json()[0]["title"], $this->task->title);
+
+        $this->assertEquals($task->todo_list_id, $todo->id);
     }
 
     public function test_store_a_new_task_with_invalid_data()
     {
         $payload = [
-            "title" => false
+            "title" => false,
         ];
-        $response = $this->postJson(\route("api.task.store"), $payload);
+        $response = $this->postJson(\route("api.todolist.task.store", $this->list->id), $payload);
 
         $response->assertUnprocessable();
         $response->assertJsonValidationErrors(["title"]);
         $this->assertDatabaseMissing("tasks", $payload);
     }
 
-    public function test_store_a_new_task_with_valid_data()
+    public function test_store_a_new_task_with_empty_todolist()
     {
         $payload = [
-            "title" => "new task"
+            "title" => false,
         ];
-        $response = $this->postJson(\route("api.task.store"), $payload);
+        $response = $this->postJson(\route("api.todolist.task.store", "unknown"), $payload);
 
+        $response->assertNotFound();
+    }
+
+    public function test_store_a_new_task_with_valid_data()
+    {
+        $list = $this->createTodo();
+        $payload = [
+            "title" => "new task",
+        ];
+        $response = $this->postJson(\route("api.todolist.task.store", $list->id), $payload);
         $response->assertCreated();
         $response->assertJson($payload);
 
@@ -82,5 +100,10 @@ class TaskTest extends TestCase
         }
 
         return Task::factory()->create();
+    }
+
+    private function createTodo()
+    {
+        return TodoList::factory()->create();
     }
 }

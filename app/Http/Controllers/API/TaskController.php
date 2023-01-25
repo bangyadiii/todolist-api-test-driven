@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\CreateTaskRequest;
 use App\Models\Task;
+use App\Models\TodoList;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
@@ -15,9 +16,12 @@ class TaskController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(TodoList $todolist)
     {
-        $taks =  Task::all();
+        $taks =  Task::whereHas("todolist", function ($query) use ($todolist) {
+            $query->where($todolist->id);
+        })->get();
+
         return \response($taks, Response::HTTP_OK);
     }
 
@@ -25,11 +29,15 @@ class TaskController extends Controller
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Models\TodoList  $todolist
      * @return \Illuminate\Http\Response
      */
-    public function store(CreateTaskRequest $request)
+    public function store(CreateTaskRequest $request, TodoList $todolist)
     {
-        $task = Task::create($request->validated());
+        $data = $request->validated();
+        $data["todo_list_id"]  = $todolist->id;
+        $task = Task::create($data);
+
         return \response()->json($task, Response::HTTP_CREATED);
     }
 
@@ -65,6 +73,7 @@ class TaskController extends Controller
     public function destroy($id)
     {
         $task = Task::findOrFail($id);
+
         $task->delete();
 
         return \response()->noContent();
