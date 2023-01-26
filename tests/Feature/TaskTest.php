@@ -80,7 +80,11 @@ class TaskTest extends TestCase
 
     public function test_update_task_with_non_exist_task()
     {
-        $response = $this->putJson(\route("api.task.update",  "unknown"));
+        $payload = [
+            "title" => "updated title",
+            "status"  => Task::CANCELLED
+        ];
+        $response = $this->putJson(\route("api.task.update",  'unknown'), $payload);
 
         $response->assertNotFound();
     }

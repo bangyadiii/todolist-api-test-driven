@@ -4,6 +4,7 @@ namespace Tests;
 
 use App\Models\Task;
 use App\Models\TodoList;
+use App\Models\User;
 use Illuminate\Contracts\Console\Kernel;
 
 trait CreatesApplication
@@ -44,5 +45,14 @@ trait CreatesApplication
         }
 
         return TodoList::factory()->create();
+    }
+
+    public function createUser($args = [])
+    {
+        if (isset($args)) {
+            return User::factory()->create($args);
+        }
+
+        return User::factory()->create();
     }
 }
