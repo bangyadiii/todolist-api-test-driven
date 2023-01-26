@@ -18,11 +18,11 @@ class TaskController extends Controller
      */
     public function index(TodoList $todolist)
     {
-        $taks =  Task::whereHas("todolist", function ($query) use ($todolist) {
-            $query->where($todolist->id);
+        $task =  Task::withWhereHas("todolist", function ($query) use ($todolist) {
+            $query->where("id", $todolist->id);
         })->get();
 
-        return \response($taks, Response::HTTP_OK);
+        return \response($task, Response::HTTP_OK);
     }
 
     /**

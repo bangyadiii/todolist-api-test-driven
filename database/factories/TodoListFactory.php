@@ -17,8 +17,8 @@ class TodoListFactory extends Factory
     public function definition()
     {
         return [
-            "title" => $this->faker->word(2),
-            "description" => $this->faker->sentence(1)
+            "title" => $this->faker->sentence(2),
+            "description" => $this->faker->sentence()
         ];
     }
 }

@@ -18,8 +18,9 @@ class TaskFactory extends Factory
     public function definition()
     {
         $list = TodoList::pluck('id')->toArray();
+
         return [
-            "title" => $this->faker->word(2),
+            "title" => $this->faker->sentence(3),
             "todo_list_id" => $this->faker->randomElement($list),
         ];
     }

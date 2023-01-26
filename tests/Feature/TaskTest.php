@@ -6,16 +6,15 @@ use App\Models\Task;
 use App\Models\TodoList;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Tests\CreatesApplication;
 use Tests\TestCase;
 
 class TaskTest extends TestCase
 {
-    use RefreshDatabase;
+    use RefreshDatabase, CreatesApplication;
 
-    private $task;
-    private $list;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
         $this->list = $this->createTodo();
@@ -35,9 +34,11 @@ class TaskTest extends TestCase
         $response = $this->getJson(\route("api.todolist.task.index", $this->list->id));
 
         $response->assertOk();
-        // $data = $response->json();
-        // $this->assertEquals($response->json()[0]["title"], $this->task->title);
+        $data = $response->json();
 
+        $response->assertJsonCount(1);
+        $this->assertNotNull($data[0]["todolist"]);
+        $this->assertEquals($data[0]["title"], $this->task->title);
         $this->assertEquals($task->todo_list_id, $todo->id);
     }
 
@@ -91,19 +92,5 @@ class TaskTest extends TestCase
         $response->assertNoContent();
 
         $this->assertDatabaseMissing("tasks", ["id" => $this->task->id]);
-    }
-
-    private function createTask($args = [])
-    {
-        if (isset($args)) {
-            return Task::factory()->create($args);
-        }
-
-        return Task::factory()->create();
-    }
-
-    private function createTodo()
-    {
-        return TodoList::factory()->create();
     }
 }

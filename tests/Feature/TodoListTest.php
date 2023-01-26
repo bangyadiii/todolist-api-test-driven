@@ -11,13 +11,12 @@ use Tests\TestCase;
 class TodoListTest extends TestCase
 {
     use CreatesApplication, RefreshDatabase;
-    private $list;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
         $this->withoutExceptionHandling();
-        $this->list = TodoList::factory()->create();
+        $this->list = $this->createTodo();
     }
 
     /**
