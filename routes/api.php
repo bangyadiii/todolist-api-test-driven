@@ -18,5 +18,5 @@ use Illuminate\Support\Facades\Route;
 
 Route::as("api.")->group(function () {
     Route::apiResource("todolist", TodoListController::class);
-    Route::apiResource("todolist.task", TaskController::class)->shallow();
+    Route::apiResource("todolist.task", TaskController::class)->shallow()->except("show");
 });

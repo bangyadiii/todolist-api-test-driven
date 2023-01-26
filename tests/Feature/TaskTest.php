@@ -78,6 +78,41 @@ class TaskTest extends TestCase
         $this->assertNotNull($response->json()["id"]);
     }
 
+    public function test_update_task_with_non_exist_task()
+    {
+        $response = $this->putJson(\route("api.task.update",  "unknown"));
+
+        $response->assertNotFound();
+    }
+
+    public function test_update_task_with_invalid_payload()
+    {
+        $payload = [
+            "title" => false,
+            "status"  => "not started yet"
+        ];
+        $response = $this->putJson(\route("api.task.update",  $this->task->id), $payload);
+
+        $response->assertUnprocessable();
+        $data = $response->json();
+        $response->assertJsonValidationErrors(["title", "status"]);
+    }
+
+
+    public function test_update_task_with_valid_payload()
+    {
+        $payload = [
+            "title" => "updated title",
+            "status"  => Task::CANCELLED
+        ];
+        $response = $this->putJson(\route("api.task.update",  $this->task->id), $payload);
+
+        $response->assertOk();
+        $data = $response->json();
+        $response->assertSimilarJson($data, $payload);
+        $this->assertDatabaseHas("tasks", $payload);
+    }
+
     public function test_delete_task_with_non_exist_task()
     {
         $response = $this->deleteJson(\route("api.task.destroy",  "unknown"));
