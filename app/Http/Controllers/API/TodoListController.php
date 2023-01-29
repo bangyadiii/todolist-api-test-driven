@@ -19,9 +19,10 @@ class TodoListController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        return TodoList::all();
+        $list =  TodoList::where("user_id", $request->user()->id)->get();
+        return $list;
     }
 
     /**

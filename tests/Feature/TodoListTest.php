@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\TodoList;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Laravel\Sanctum\Sanctum;
@@ -19,7 +20,7 @@ class TodoListTest extends TestCase
         $this->withoutExceptionHandling();
         $this->createAuthUser();
         Sanctum::actingAs($this->authUser);
-        $this->list = $this->createTodo();
+        $this->list = $this->createTodo(['user_id' => $this->authUser->id]);
     }
 
     /**
@@ -27,14 +28,17 @@ class TodoListTest extends TestCase
      *
      * @return void
      */
-    public function test_get_todo_list()
+    public function test_fetch_current_user_todo_lists()
     {
         // action
-        $response = $this->get(route("api.todolist.index"));
+        $otherUser = User::factory()->create();
+        $this->createTodo(["user_id" => $otherUser->id]);
+        $response = $this->getJson(route("api.todolist.index"));
 
         // assert
         $response->assertStatus(200);
-        $this->assertEquals(1, count($response->json()));
+        $response->assertJsonCount(1);
+        $this->assertEquals($this->authUser->id, $response->json()[0]["user_id"]);
     }
 
     public function test_not_found_when_show_todo_detail_with_invalid_id()
