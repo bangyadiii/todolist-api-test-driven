@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\TodoList;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Laravel\Sanctum\Sanctum;
 use Tests\CreatesApplication;
 use Tests\TestCase;
 
@@ -16,6 +17,8 @@ class TodoListTest extends TestCase
     {
         parent::setUp();
         $this->withoutExceptionHandling();
+        $this->createAuthUser();
+        Sanctum::actingAs($this->authUser);
         $this->list = $this->createTodo();
     }
 

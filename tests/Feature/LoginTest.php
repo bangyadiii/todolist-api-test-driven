@@ -11,7 +11,6 @@ use Tests\TestCase;
 class LoginTest extends TestCase
 {
     use CreatesApplication, RefreshDatabase;
-    private User $user;
     /**
      * Login test 
      *
@@ -21,17 +20,29 @@ class LoginTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->user = $this->createUser();
+        $this->createAuthUser();
     }
 
+    public function test_cannot_login_with_invalid_credentials(): void
+    {
+        $response = $this->postJson(route("api.auth.login"), [
+            "email" => "unknown_email@gmail.com",
+            "password" => "wrong_password"
+        ]);
+
+        $response->assertUnauthorized();
+    }
     public function test_user_can_login_with_valid_credentials()
     {
         $response = $this->postJson(route("api.auth.login"), [
-            "email" => $this->user->email,
+            "email" => $this->authUser->email,
             "password" => "password"
         ]);
 
         $response->assertOk();
-        $this->assertAuthenticatedAs($this->user, "api");
+
+        $token = $response->json()["data"]["access_token"];
+        $this->assertNotEmpty($token);
+        $this->assertDatabaseHas("personal_access_tokens", ['tokenable_id' => $this->authUser->id]);
     }
 }

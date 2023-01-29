@@ -17,7 +17,8 @@ class TaskUnitTest extends TestCase
      */
     public function test_todolist_method_return_todolist_relations()
     {
-        $list = $this->createTodo();
+        $this->createAuthUser();
+        $list = $this->createTodo(["user_id" => $this->authUser->id]);
         $task = $this->createTask(["todo_list_id" => $list->id]);
 
         $list->fresh();

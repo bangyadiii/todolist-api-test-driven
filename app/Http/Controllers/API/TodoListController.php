@@ -32,7 +32,9 @@ class TodoListController extends Controller
      */
     public function store(PostTodoListRequest $request)
     {
-        $list = TodoList::create($request->validated());
+        $data = $request->validated();
+        $data['user_id'] = $request->user()->id;
+        $list = TodoList::create($data);
         return \response()->json($list, Response::HTTP_CREATED);
     }
 

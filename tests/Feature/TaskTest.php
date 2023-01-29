@@ -6,6 +6,7 @@ use App\Models\Task;
 use App\Models\TodoList;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Laravel\Sanctum\Sanctum;
 use Tests\CreatesApplication;
 use Tests\TestCase;
 
@@ -17,6 +18,8 @@ class TaskTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        $this->createAuthUser();
+        Sanctum::actingAs($this->authUser);
         $this->list = $this->createTodo();
         $this->task = $this->createTask();
     }

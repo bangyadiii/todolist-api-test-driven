@@ -5,7 +5,6 @@ namespace App\Http\Controllers\API\Auth;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\RegisterUserRequest;
 use App\Models\User;
-use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Hash;
 
@@ -23,6 +22,6 @@ class RegisterUserController extends Controller
         $data["password"] = Hash::make($request["password"]);
         $user = User::create($data);
 
-        return \response()->json($user, Response::HTTP_CREATED);
+        return \response()->json($user, 201);
     }
 }

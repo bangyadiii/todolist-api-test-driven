@@ -12,7 +12,8 @@ class TodoListUnitTest extends TestCase
 
     public function test_if_todolist_deleted_and_then_task_will_be_deleted()
     {
-        $list = $this->createTodo();
+        $this->createAuthUser();
+        $list = $this->createTodo(["user_id" => $this->authUser->id]);
         $list2 = $this->createTodo();
         $task = $this->createTask(["todo_list_id" => $list->id]);
         $task2 = $this->createTask(["todo_list_id" => $list2->id]);

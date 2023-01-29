@@ -9,10 +9,7 @@ use Illuminate\Contracts\Console\Kernel;
 
 trait CreatesApplication
 {
-    protected $task;
-    protected $list;
-
-
+   
 
     /**
      * Creates the application.
@@ -29,30 +26,4 @@ trait CreatesApplication
     }
 
 
-    protected function createTask($args = [])
-    {
-        if (isset($args)) {
-            return Task::factory()->create($args);
-        }
-
-        return Task::factory()->create();
-    }
-
-    protected function createTodo($args = [])
-    {
-        if (isset($args)) {
-            return TodoList::factory()->create($args);
-        }
-
-        return TodoList::factory()->create();
-    }
-
-    public function createUser($args = [])
-    {
-        if (isset($args)) {
-            return User::factory()->create($args);
-        }
-
-        return User::factory()->create();
-    }
 }
