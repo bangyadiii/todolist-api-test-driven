@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\CreateLabelRequest;
+use App\Http\Requests\UpdateLabelRequest;
 use App\Models\Label;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -16,9 +17,10 @@ class LabelController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $label = Label::where("user_id", $request->user()->id)->get();
+        return $label;
     }
 
     /**
@@ -29,7 +31,9 @@ class LabelController extends Controller
      */
     public function store(CreateLabelRequest $request)
     {
-        $label = Label::create($request->validated());
+        $data = $request->validated();
+        $data["user_id"] = $request->user()->id;
+        $label = Label::create($data);
         return \response()->json($label, Response::HTTP_CREATED);
     }
 
@@ -51,9 +55,15 @@ class LabelController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(UpdateLabelRequest $request, $id)
     {
-        //
+        $label =  Label::find($id);
+        \abort_if(!$label, Response::HTTP_NOT_FOUND, "Label not found.");
+
+        $label->fill($request->all())
+            ->saveOrFail();
+
+        return \response()->json($label, Response::HTTP_OK);
     }
 
     /**

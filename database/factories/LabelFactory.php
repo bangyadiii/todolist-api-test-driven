@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -16,9 +17,11 @@ class LabelFactory extends Factory
      */
     public function definition()
     {
+        $ids = User::pluck("id");
         return [
             "title" => $this->faker->sentence(1),
             "color" => $this->faker->hexColor(),
+            "user_id" => $this->faker->randomElement($ids)
         ];
     }
 }
