@@ -21,7 +21,7 @@ class TaskUnitTest extends TestCase
         $list = $this->createTodo(["user_id" => $this->authUser->id]);
         $task = $this->createTask(["todo_list_id" => $list->id]);
 
-        $list->fresh();
+        $list->refresh();
 
         $this->assertInstanceOf(TodoList::class, $task->todolist);
         $this->assertEquals($list->id, $task->todolist->id);

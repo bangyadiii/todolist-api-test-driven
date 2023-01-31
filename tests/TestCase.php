@@ -12,8 +12,8 @@ abstract class TestCase extends BaseTestCase
 {
     use CreatesApplication;
     public User $authUser;
-    protected $task;
-    protected $list;
+    protected Task $task;
+    protected TodoList $list;
 
     protected function createLabel($args = [])
     {
