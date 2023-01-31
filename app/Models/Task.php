@@ -24,8 +24,8 @@ class Task extends Model
         return $this->belongsTo(TodoList::class, "todo_list_id");
     }
 
-    public function label(): BelongsToMany
+    public function labels(): BelongsToMany
     {
-        return $this->belongsToMany(Label::class, "label_tasks");
+        return $this->belongsToMany(Label::class, "label_task");
     }
 }

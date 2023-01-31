@@ -55,7 +55,7 @@ class LabelTaskTest extends TestCase
             "labelId" => $this->label->id,
         ]))->assertOk();
 
-        $this->assertDatabaseHas("label_tasks", [
+        $this->assertDatabaseHas("label_task", [
             "task_id" => $this->task->id,
             "label_id" => $this->label->id
         ]);
@@ -78,7 +78,7 @@ class LabelTaskTest extends TestCase
             "labelId" => $this->label->id,
         ]))->assertOk();
 
-        $this->assertDatabaseMissing("label_tasks", [
+        $this->assertDatabaseMissing("label_task", [
             "task_id" => $this->task->id,
             "label_id" => $this->label->id
         ]);

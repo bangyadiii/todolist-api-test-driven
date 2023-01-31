@@ -83,7 +83,7 @@ class TaskController extends Controller
         $label = Label::find($labelId);
         \abort_if(!$label, Response::HTTP_NOT_FOUND, "Label not found");
 
-        $task->label()->attach($label);
+        $task->labels()->attach($label);
 
         return \response()->json([
             "message" => "Label berhasil ditambahkan ke task"
@@ -98,7 +98,7 @@ class TaskController extends Controller
         $task = Task::find($taskId);
         \abort_if(!$task, Response::HTTP_NOT_FOUND, "Task not found");
 
-        $task->label()->detach($label);
+        $task->labels()->detach($label);
 
         return \response()->json([
             "message" => "Label berhasil dicopot dari task"
