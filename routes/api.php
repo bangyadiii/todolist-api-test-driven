@@ -30,5 +30,9 @@ Route::as("api.")->group(function () {
         Route::apiResource("todolist", TodoListController::class);
         Route::apiResource("todolist.task", TaskController::class)->shallow()->except("show");
         Route::apiResource("labels", LabelController::class);
+        Route::as("tasklabel.")->group(function () {
+            Route::post("/task/{taskId}/label/{labelId}", [TaskController::class, "attachLabel"])->name("store");
+            Route::delete("/task/{taskId}/label/{labelId}", [TaskController::class, "detachLabel"])->name("destroy");
+        });
     });
 });

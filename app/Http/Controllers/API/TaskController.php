@@ -5,8 +5,10 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\CreateTaskRequest;
 use App\Http\Requests\UpdateTaskRequest;
+use App\Models\Label;
 use App\Models\Task;
 use App\Models\TodoList;
+use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
@@ -71,5 +73,35 @@ class TaskController extends Controller
         $task->delete();
 
         return \response()->noContent();
+    }
+
+    public function attachLabel($taskId, $labelId)
+    {
+        $task = Task::find($taskId);
+        \abort_if(!$task, Response::HTTP_NOT_FOUND, "Task not found");
+
+        $label = Label::find($labelId);
+        \abort_if(!$label, Response::HTTP_NOT_FOUND, "Label not found");
+
+        $task->label()->attach($label);
+
+        return \response()->json([
+            "message" => "Label berhasil ditambahkan ke task"
+        ]);
+    }
+
+    public function detachLabel($taskId, $labelId)
+    {
+        $label = Label::find($labelId);
+        \abort_if(!$label, Response::HTTP_NOT_FOUND, "Label not found");
+
+        $task = Task::find($taskId);
+        \abort_if(!$task, Response::HTTP_NOT_FOUND, "Task not found");
+
+        $task->label()->detach($label);
+
+        return \response()->json([
+            "message" => "Label berhasil dicopot dari task"
+        ]);
     }
 }
