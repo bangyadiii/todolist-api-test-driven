@@ -5,12 +5,11 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\PostTodoListRequest;
 use App\Http\Requests\UpdateTodoListRequest;
+use App\Http\Resources\API\V1\TodoListResource;
 use App\Models\TodoList;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Validator;
-use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
+
 
 class TodoListController extends Controller
 {
@@ -21,8 +20,10 @@ class TodoListController extends Controller
      */
     public function index(Request $request)
     {
-        $list =  TodoList::where("user_id", $request->user()->id)->get();
-        return $list;
+        $list =  TodoList::with("user")->get();
+        return response()->json([
+            "data" => TodoListResource::collection($list)
+        ], Response::HTTP_OK);
     }
 
     /**
@@ -36,7 +37,9 @@ class TodoListController extends Controller
         $data = $request->validated();
         $data['user_id'] = $request->user()->id;
         $list = TodoList::create($data);
-        return \response()->json($list, Response::HTTP_CREATED);
+        return \response()->json([
+            "data" => TodoListResource::make($list)
+        ], Response::HTTP_CREATED);
     }
 
     /**
@@ -47,7 +50,10 @@ class TodoListController extends Controller
      */
     public function show($id)
     {
-        return TodoList::findOrFail($id);
+        $list = TodoList::findOrFail($id);
+        return \response()->json([
+            "data" => TodoListResource::make($list)
+        ], Response::HTTP_OK);
     }
 
 
@@ -64,7 +70,9 @@ class TodoListController extends Controller
         $list->fill($request->all())
             ->saveOrFail();
 
-        return \response()->json($list, Response::HTTP_OK);
+        return \response()->json([
+            "data" => TodoListResource::make($list)
+        ], Response::HTTP_OK);
     }
 
     /**

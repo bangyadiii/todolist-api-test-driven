@@ -39,6 +39,7 @@ class TodoListTest extends TestCase
         $response->assertOk();
         $data = $response->json();
 
+        dd($response->json());
         // Assert that the response only contains one todo list item 
         $this->assertCount(1, $data["data"]);
 
@@ -58,8 +59,9 @@ class TodoListTest extends TestCase
         $response = $this->get(route("api.todolist.show", $this->list->id))
             ->assertOk();
 
-        $this->assertEquals($response->json("title"), $this->list->title);
-        $this->assertEquals($response->json("description"), $this->list->description);
+        $data = $response->json("data");
+        $this->assertEquals($data["attributes"]["title"], $this->list->title);
+        $this->assertEquals($data["attributes"]["description"], $this->list->description);
     }
 
     public function test_post_new_todo_list_with_valid_payload()
@@ -71,8 +73,10 @@ class TodoListTest extends TestCase
         ]))
             ->assertCreated();
 
-        $this->assertDatabaseHas("todo_lists", ["title" => $response->json("title")]);
-        $this->assertEquals($todoList->title, $response->json("title"));
+        $data = $response->json("data");
+
+        $this->assertDatabaseHas("todo_lists", ["title" => $data["attributes"]["title"]]);
+        $this->assertEquals($todoList->title, $data["attributes"]["title"]);
     }
 
     public function test_post_new_todo_list_with_invalid_payload()
@@ -125,23 +129,29 @@ class TodoListTest extends TestCase
 
     public function test_update_todo_list_with_valid_payload()
     {
-        $response = $this->putJson(\route("api.todolist.update", $this->list->id), [
+        $payload = [
             "title" => "update success"
-        ])
+        ];
+        $response = $this->putJson(\route("api.todolist.update", $this->list->id), $payload)
             ->assertOk();
+
         $this->assertDatabaseHas(
             "todo_lists",
             [
                 "id" => $this->list->id,
-                "title" => "update success"
+                "title" => $payload["title"]
             ]
         );
-        $arr = $response->json();
+        $arr = $response->json("data");
 
         $response->assertJson([
-            "id" => $this->list->id,
-            "title" => $arr["title"],
-            "description" => $arr["description"],
+            "data" => [
+                "id" => $this->list->id,
+                "attributes" => [
+                    "title" => $arr["attributes"]["title"],
+                    "description" => $arr["attributes"]["description"],
+                ],
+            ],
         ]);
     }
 
@@ -152,5 +162,4 @@ class TodoListTest extends TestCase
         $this->assertDatabaseMissing("todo_lists", ["id" => $this->list->id]);
         $this->assertDatabaseMissing("tasks", ["todo_list_id" => $this->list->id]);
     }
-    // can you analyze this whole project, and make it clean with clean architecture concept?
 }
